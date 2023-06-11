@@ -10,6 +10,6 @@ Using
 - save to file option (raw dump of iterations in each coordinate, needs reprocessing for generating an image)
 - with / without repeats (1-99 or endless)
 
-ToDo: enter x / y location, diff and max iteration
+Included utilty (FractRaw2Png) do convert the saved raw dump to PNG
 
-ToDo: utilty do convert the saved image to PNG
+ToDo: enter x / y location, diff and max iteration

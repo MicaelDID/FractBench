@@ -5,6 +5,8 @@ VisualStudioVersion = 17.3.32811.315
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FractBench", "FractBench\FractBench.csproj", "{36BB47DA-FF75-4B5D-8734-1F2CCB209A3A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FractRaw2Png", "FractRaw2Png\FractRaw2Png.csproj", "{6CC2E525-AFA3-4C84-AC01-D314BEDF2DF4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{36BB47DA-FF75-4B5D-8734-1F2CCB209A3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36BB47DA-FF75-4B5D-8734-1F2CCB209A3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{36BB47DA-FF75-4B5D-8734-1F2CCB209A3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CC2E525-AFA3-4C84-AC01-D314BEDF2DF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CC2E525-AFA3-4C84-AC01-D314BEDF2DF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CC2E525-AFA3-4C84-AC01-D314BEDF2DF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CC2E525-AFA3-4C84-AC01-D314BEDF2DF4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
