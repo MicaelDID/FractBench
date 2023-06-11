@@ -10,29 +10,62 @@ namespace FractBench
 {
     internal class Program
     {
+        static List<int> xres = new List<int> { 640, 1280, 1920, 3840, 7680, 3 * 3840, 16000, 32000 };
+        static List<int> yres = new List<int> { 480, 720, 1080, 2160, 4320, 3 * 2160, 16000, 32000 };
+        static List<string> lstModes = new List<string> { "Single threaded", "Multiple threaded (normal)", "Multiple threaded (optimal)" };
+        static List<string> lstSaves = new List<string> { "None", "Memory", "None", "Memory", "File" };
+        static List<string> lstUnits = new List<string> { "b", "kb", "mb", "gb", "tb" };
+
         static void Main(string[] args)
         {
             Console.WriteLine($"Simple Fractal Benchmark");
             Console.WriteLine($"Logical processors: {Environment.ProcessorCount}");
-            Bench bench;
-            var xres = new List<int> { 640, 1280, 1920, 3840, 7680, 3 * 3840, 16000, 32000 };
-            var yres = new List<int> { 480, 720, 1080, 2160, 4320, 3 * 2160, 16000, 32000 };
-            var lstModes = new List<string> { "Single threaded", "Multiple threaded (normal)", "Multiple threaded (optimal)" };
-            var lstSaves = new List<string> { "None", "Memory", "None", "Memory", "File" };
-            var lstUnits = new List<string> { "b", "kb", "mb", "gb", "tb" };
 
-            // Continue until user press 0 or ESC
-            while (true)
+            if (args.Length > 1 || (args.Length == 1 && !(args[0].Length == 4 || args[0].Length == 6)))
             {
-                object[] data = null;
+                Console.WriteLine($"Incorrect number of arguments or incorrect argument");
+                return;
+            }
+            else if (args.Length == 1)
+            {
+                var intLoc = (int)(args[0][0] - '0');
+                var intScrRes = (int)(args[0][1] - '0');
+                var intSave = (int)(args[0][2] - '0');
+                int intRepeatNum = -1, intNum1 = -1, intNum2 = -1, intIdx = 3;
+                if (intSave == 3 || intSave == 4)
+                {
+                    intNum1 = (int)(args[0][3] - '0');
+                    intNum2 = (int)(args[0][4] - '0');
+
+                    if (intNum1 < 0 || intNum1 > 9 || intNum2 < 0 || intNum2 > 9)
+                    {
+                        Console.WriteLine($"Incorrect argument");
+                        return;
+                    }
+
+                    intRepeatNum = intNum1 == 0 && intNum2 == 0 ? 100 : intNum1 * 10 + intNum2;
+                    intIdx = 5;
+                }
+                var intCalcMode = (int)(args[0][intIdx] - '0');
+
+                if (intLoc < 1 || intLoc > 4 || intScrRes < 1 || intScrRes > 8 || intSave < 1 || intSave > 5 || intCalcMode < 1 || intCalcMode > 3)
+                {
+                    Console.WriteLine($"Incorrect argument");
+                    return;
+                }
+
+                FractalBenchmark(intLoc, xres[intScrRes - 1], yres[intScrRes - 1], intSave, intRepeatNum, intCalcMode);
+                return;
+            }
+
+            while (true) // Continue until user press 0 or ESC during input or ctrl c at any time
+            {
                 Console.WriteLine();
                 Console.Write("Select location [1. Standard 2. Low 3. Medium 4. High] ");
                 var intLoc = ReadNumber(4);
 
                 Console.Write("Select resolution [1. 480p 2. 720p 3. 1080p 4. 4k, 5. 8k, 6. 3x3 4k 7. memtest1, 8. memtest2] ");
                 var intScrRes = ReadNumber(8);
-                var x = xres[intScrRes - 1];
-                var y = yres[intScrRes - 1];
 
                 Console.Write("Select save [1. None 2. Memory 3. None with repeat 4. Memory with repeat 5. File] ");
                 var intSave = ReadNumber(5);
@@ -43,95 +76,103 @@ namespace FractBench
                     Console.Write("Select repeat number [01-99 or 00 for endless] ");
                     var num1 = ReadNumber(9, false, false);
                     var num2 = ReadNumber(9, false);
-                    intRepeatNum = num1 * 10 + num2;
+                    intRepeatNum = num1 == 0 && num2 == 0 ? 100 : num1 * 10 + num2;
                 }
 
                 Console.Write("Select calculation [1. Single threaded 2. Multiple threaded (normal) 3. Multiple threaded (optimal)] ");
                 var intCalcMode = ReadNumber(3);
 
-                while (true)
+                FractalBenchmark(intLoc, xres[intScrRes - 1], yres[intScrRes - 1], intSave, intRepeatNum, intCalcMode);
+            }
+        }
+
+        static void FractalBenchmark(int intLoc, int intX, int intY, int intSave, int intRepeatNum, int intCalcMode)
+        {
+            Bench bench;
+            object[] data = null;
+
+            while (true)
+            {
+                if (intLoc == 1)
+                    bench = new Bench();
+                else if (intLoc == 2)
+                    bench = new Bench(-1.39415229360722, -0.00180321371397862, 0.000000000000454747350886464, 50000);
+                else if (intLoc == 3)
+                    bench = new Bench(0.251106774256728, -0.0000724877441406802, 0.000000002, 500000);
+                else
+                    bench = new Bench(0.339309693454861, -0.570137012708333, 0.00000000625, 1500000);
+
+                var dteBeg = DateTime.Now;
+                bench.FixCorr(intX, intY);
+
+                if (intSave == 2 || intSave == 4 || intSave == 5)
                 {
-                    if (intLoc == 1)
-                        bench = new Bench();
-                    else if (intLoc == 2)
-                        bench = new Bench(-1.39415229360722, -0.00180321371397862, 0.000000000000454747350886464, 50000);
-                    else if (intLoc == 3)
-                        bench = new Bench(0.251106774256728, -0.0000724877441406802, 0.000000002, 500000);
-                    else
-                        bench = new Bench(0.339309693454861, -0.570137012708333, 0.00000000625, 1500000);
+                    data = new object[intY];
 
-                    var dteBeg = DateTime.Now;
-                    bench.FixCorr(x, y);
-
-                    if (intSave == 2 || intSave == 4 || intSave == 5)
-                    {
-                        data = new object[y];
-
-                        for (int j = 0; j < y; j++)
-                            data[j] = Bench.Repeated(x);
-                    }
-
-                    if (intCalcMode == 1)
-                        bench.DrawNormal(x, y, data);
-                    else if (intCalcMode == 2)
-                        bench.DrawParallel(x, y, data, -1);
-                    else
-                        bench.DrawParallel(x, y, data, Environment.ProcessorCount * 2);
-
-                    var dteEnd = DateTime.Now;
-                    Console.WriteLine($"Location {intLoc}, Resolution {x} x {y}, Save {lstSaves[intSave - 1]}, {lstModes[intCalcMode - 1]}, Elapsed {dteEnd.Subtract(dteBeg).TotalMilliseconds:###,###,###,##0} ms");
-                    bench = null;
-
-                    if (data != null)
-                    {
-                        int intMin = -1, intMax = -1;
-                        long lngMaxiter = 0, lngAlloc = (long)sizeof(int) * (long)x * (long)y;
-
-                        foreach (var item in data)
-                        {
-                            var intVal = ((List<int>)item).Where(z => z < Bench.MAXITER).Max();
-                            lngMaxiter += ((List<int>)item).Where(z => z == Bench.MAXITER).Count();
-
-                            if (intVal > intMax)
-                                intMax = intVal;
-
-                            intVal = ((List<int>)item).Min();
-
-                            if (intMin == -1 || intVal < intMin)
-                                intMin = intVal;
-                        }
-
-                        var dblAlloc = (double)lngAlloc;
-                        int i;
-
-                        for (i = 0; i <= 4; i++)
-                        {
-                            if (i > 0)
-                                dblAlloc /= 1024d;
-
-                            if (dblAlloc < 1024 || i == 4)
-                                break;
-                        }
-
-                        Console.WriteLine($"Alloc {dblAlloc:0.0} {lstUnits[i]}, Iteration Min {intMin}, Max {intMax:###,###,###,##0}, MaxIter reached {lngMaxiter:###,###,###,##0}");
-                    }
-
-                    if (intSave == 1 || intSave == 2 || intSave == 5)
-                        break;
-
-                    if (--intRepeatNum <= 0)
-                        break;
-
-                    if (data != null && (intSave == 2 || intSave == 4 || intSave == 5))
-                        ClearData(data, y);
+                    for (int j = 0; j < intY; j++)
+                        data[j] = Bench.Repeated(intX);
                 }
 
-                if (data != null && intSave == 5)
-                    SaveData(data, x, y);
+                if (intCalcMode == 1)
+                    bench.DrawNormal(intX, intY, data);
+                else if (intCalcMode == 2)
+                    bench.DrawParallel(intX, intY, data, -1);
+                else
+                    bench.DrawParallel(intX, intY, data, Environment.ProcessorCount * 2);
+
+                var dteEnd = DateTime.Now;
+                Console.WriteLine($"Location {intLoc}, Resolution {intX} x {intY}, Save {lstSaves[intSave - 1]}, {lstModes[intCalcMode - 1]}, Elapsed {dteEnd.Subtract(dteBeg).TotalMilliseconds:###,###,###,##0} ms");
+                bench = null;
+
+                if (data != null)
+                {
+                    int intMin = -1, intMax = -1;
+                    long lngMaxiter = 0, lngAlloc = (long)sizeof(int) * (long)intX * (long)intY;
+
+                    foreach (var item in data)
+                    {
+                        var intVal = ((List<int>)item).Where(z => z < Bench.MAXITER).Max();
+                        lngMaxiter += ((List<int>)item).Where(z => z == Bench.MAXITER).Count();
+
+                        if (intVal > intMax)
+                            intMax = intVal;
+
+                        intVal = ((List<int>)item).Min();
+
+                        if (intMin == -1 || intVal < intMin)
+                            intMin = intVal;
+                    }
+
+                    var dblAlloc = (double)lngAlloc;
+                    int i;
+
+                    for (i = 0; i <= 4; i++)
+                    {
+                        if (i > 0)
+                            dblAlloc /= 1024d;
+
+                        if (dblAlloc < 1024 || i == 4)
+                            break;
+                    }
+
+                    Console.WriteLine($"Alloc {dblAlloc:0.0} {lstUnits[i]}, Iteration Min {intMin}, Max {intMax:###,###,###,##0}, MaxIter reached {lngMaxiter:###,###,###,##0}");
+                }
+
+                if (intSave == 1 || intSave == 2 || intSave == 5)
+                    break;
+
+                if (intRepeatNum < 100 && --intRepeatNum <= 0)
+                    break;
 
                 if (data != null && (intSave == 2 || intSave == 4 || intSave == 5))
-                    ClearData(data, y);
+                    ClearData(data, intY);
             }
+
+            if (data != null && intSave == 5)
+                SaveData(data, intX, intY);
+
+            if (data != null && (intSave == 2 || intSave == 4 || intSave == 5))
+                ClearData(data, intY);
         }
 
         static void ClearData(object[] data, int y)
@@ -279,7 +320,7 @@ namespace FractBench
 
         private static IEnumerable<int> SteppedIterator(int intStartIndex, int intEndIndex)
         {
-            // insanely more fun than: for (int i = intStartIndex; i < intEndIndex; i++) yield return i;
+            // Insanely more fun than: for (int i = intStartIndex; i < intEndIndex; i++) yield return i;
             int intDiff = intEndIndex - intStartIndex;
 
             for (int i = 0, n = 0, m = 0; i < intDiff; i++)
