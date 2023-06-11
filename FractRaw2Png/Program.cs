@@ -27,30 +27,49 @@ namespace FractRaw2Png
 
         static void Raw2Png(int x, int y)
         {
-            var bmpFractal = new Bitmap(x, y);
+            var dteBeg = DateTime.Now;
+            byte[] bteData;
 
             using (var stream = new FileStream("output.dat", FileMode.Open, FileAccess.Read, FileShare.Read))
             using (var reader = new BinaryReader(stream))
             {
-                int i = 0, j = 0;
-
-                while (reader.BaseStream.Length - reader.BaseStream.Position >= 4)
+                if (reader.BaseStream.Length > int.MaxValue || reader.BaseStream.Length != x * y * 4)
                 {
-                    var bteData = reader.ReadBytes(4);
-                    var intIter = BitConverter.ToInt32(bteData, 0);
-                    bmpFractal.SetPixel(i, j, intIter == MAXITER ? Color.Black : GetColor1(intIter));
-
-                    i = (i + 1) % x;
-
-                    if (i == 0)
-                        j++;
+                    Console.WriteLine("File size does not match image size or file too big");
+                    return;
                 }
 
-                if (j != y || i != 0)
-                    Console.WriteLine("Size does not match file");
+                bteData = reader.ReadBytes((int)reader.BaseStream.Length);
             }
 
+            var bmpFractal = new Bitmap(x, y);
+
+            //Somehow the multi threaded version seems slower
+            //Parallel.For(0, y, (j, loopState) =>
+            //{
+            //    int n = j * x * 4;
+            //    for (int i = 0; i < x; i++, n += 4)
+            //    {
+            //        var intIter = BitConverter.ToInt32(bteData, n);
+            //        var col = intIter == MAXITER ? Color.Black : GetColor1(intIter);
+            //        lock (bteData)
+            //        {
+            //            bmpFractal.SetPixel(i, j, col);
+            //        }
+            //    }
+            //});
+
+            //While the single threaded is faster
+            for (int j = 0, n = 0; j < y; j++)
+                for (int i = 0; i < x; i++, n += 4)
+                {
+                    var intIter = BitConverter.ToInt32(bteData, n);
+                    bmpFractal.SetPixel(i, j, intIter == MAXITER ? Color.Black : GetColor1(intIter));
+                }
+
             bmpFractal.Save("output.png", System.Drawing.Imaging.ImageFormat.Png);
+            var dteEnd = DateTime.Now;
+            Console.WriteLine($"Elapsed {dteEnd.Subtract(dteBeg).TotalMilliseconds:###,###,###,##0} ms");
         }
 
         static Color Hsb2Rgb(double h, double s, double b)
