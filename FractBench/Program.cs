@@ -155,7 +155,7 @@ namespace FractBench
                             break;
                     }
 
-                    Console.WriteLine($"Alloc {dblAlloc:0.0} {lstUnits[i]}, Iteration Min {intMin}, Max {intMax:###,###,###,##0}, MaxIter reached {lngMaxiter:###,###,###,##0}");
+                    Console.WriteLine($"Alloc {dblAlloc:0.0} {lstUnits[i]}, Iteration Min {intMin:###,###,###,##0}, Max {intMax:###,###,###,##0}, MaxIter reached {lngMaxiter:###,###,###,##0}");
                 }
 
                 if (intSave == 1 || intSave == 2 || intSave == 5)
