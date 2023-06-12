@@ -70,3 +70,14 @@ FractBench 223103
 '10' repeat 10 times
 
 '3' multi threaded calculation
+
+## Results
+
+AMD Ryzen9 5950X 32 Logical cores
+- 2111  5 845 ms, Location 2, Resolution 640 x 480, Save None, Single threaded
+- 2313  1 712 ms, Location 2, Resolution 1920 x 1080, Save None, Multiple threaded (optimal)
+- 3313 12 424 ms, Location 3, Resolution 1920 x 1080, Save None, Multiple threaded (optimal)
+- 4313 43 204 ms, Location 4, Resolution 1920 x 1080, Save None, Multiple threaded (optimal)
+- 1723  3 871 ms, Location 1, Resolution 16000 x 16000, Save Memory, Multiple threaded (optimal)
+- 1823 11 781 ms, Location 1, Resolution 32000 x 32000, Save Memory, Multiple threaded (optimal)
+- 2523 27 565 ms, Location 2, Resolution 7680 x 4320, Save Memory, Multiple threaded (optimal)
