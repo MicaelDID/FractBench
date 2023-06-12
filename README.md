@@ -31,8 +31,9 @@ The size of the generated fractal would also affect total processing time, as we
 Memtest1 and Memtest2 are included to generate resolution of 16k x 16k and 32k x 32k, use it if you want longer running elapsed times.
 Memtest1 in combination with multi threaded and location 2 on a AMD Ryzen 9 5950X could take about 3-4 minutes.
 
-When using save to memory the code will allocate enough memory to store the whole image (and can also save this to a file) or if you select none
-then memory usage will be less of a factor comparing different computers total execution times.
+When using save to memory the code will allocate enough memory to store the whole image (and can also save iterations to a file, raw format)
+or if you select none then memory usage will be less of a factor comparing different computers total execution times. Extended information about
+about allocated memory, min / max iterations and how many times max iterations was reached are displayed.
 
 The idea of repeating the same selected options several times is to find an average or perhaps a lowest execution time, for example running it 10 times.
 
@@ -73,13 +74,76 @@ FractBench 223103
 
 ## Results
 
+### Desktop, AMD Ryzen9 5950X, 32 Logical cores (16+16), RAM 2x16 GB, DIMM, 2133 Mhz
 ```
-AMD Ryzen9 5950X 32 Logical cores, RAM 2x16 GB, DIMM, 2133 Mhz
- 2111,  5 845 ms, Location 2, Resolution 640 x 480, Save None, Single threaded
- 2313,  1 712 ms, Location 2, Resolution 1920 x 1080, Save None, Multiple threaded (optimal)
- 3313, 12 424 ms, Location 3, Resolution 1920 x 1080, Save None, Multiple threaded (optimal)
- 4313, 43 204 ms, Location 4, Resolution 1920 x 1080, Save None, Multiple threaded (optimal)
+ 2111,  5 845 ms, Location 2, Resolution   640 x   480, Save None, Single threaded
+ 2313,  1 712 ms, Location 2, Resolution  1920 x  1080, Save None, Multiple threaded (optimal)
+ 3313, 12 424 ms, Location 3, Resolution  1920 x  1080, Save None, Multiple threaded (optimal)
+ 4313, 43 204 ms, Location 4, Resolution  1920 x  1080, Save None, Multiple threaded (optimal)
  1723,  3 871 ms, Location 1, Resolution 16000 x 16000, Save Memory, Multiple threaded (optimal)
  1823, 11 781 ms, Location 1, Resolution 32000 x 32000, Save Memory, Multiple threaded (optimal)
- 2523, 27 565 ms, Location 2, Resolution 7680 x 4320, Save Memory, Multiple threaded (optimal)
+ 2523, 27 565 ms, Location 2, Resolution  7680 x  4320, Save Memory, Multiple threaded (optimal)
+```
+
+### Desktop, Intel Core i7 8700K, 12 Logical Cores (6+6), RAM 4x8 GB, DIMM, 2133 Mhz
+```
+2111,   9 872 ms, Location 2, Resolution   640 x   480, Save None, Single threaded
+2313,   6 198 ms, Location 2, Resolution  1920 x  1080, Save None, Multiple threaded (optimal)
+3313,  43 802 ms, Location 3, Resolution  1920 x  1080, Save None, Multiple threaded (optimal)
+4313, 141 861 ms, Location 4, Resolution  1920 x  1080, Save None, Multiple threaded (optimal)
+1723,   5 573 ms, Location 1, Resolution 16000 x 16000, Save Memory, Multiple threaded (optimal)
+1823,  20 878 ms, Location 1, Resolution 32000 x 32000, Save Memory, Multiple threaded (optimal)
+2523,  98 860 ms, Location 2, Resolution  7680 x  4320, Save Memory, Multiple threaded (optimal)
+```
+
+### Laptop (Lenovo), Intel Core i7 1255U, 12 Logical Cores (2+2 P, 8 E), RAM 2x16 GB, SODIMM, 3200 Mhz
+```
+ 2111,  10 238 ms, Location 2, Resolution   640 x   480, Save None, Single threaded
+ 2313,   7 624 ms, Location 2, Resolution  1920 x  1080, Save None, Multiple threaded (optimal)
+ 3313,  63 975 ms, Location 3, Resolution  1920 x  1080, Save None, Multiple threaded (optimal)
+ 4313, 160 577 ms, Location 4, Resolution  1920 x  1080, Save None, Multiple threaded (optimal)
+ 1723,   7 437 ms, Location 1, Resolution 16000 x 16000, Save Memory, Multiple threaded (optimal)
+ 1823,  24 268 ms, Location 1, Resolution 32000 x 32000, Save Memory, Multiple threaded (optimal)
+ 2523, 113 855 ms, Location 2, Resolution  7680 x  4320, Save Memory, Multiple threaded (optimal)
+```
+
+### Laptop (MSI), Intel Core i7 9750H, 12 Logical Cores (6+6), RAM 2x8 GB, SODIMM, 2667 Mhz
+```
+2111,   9 061 ms, Location 2, Resolution   640 x   480, Save None, Single threaded
+2313,   6 193 ms, Location 2, Resolution  1920 x  1080, Save None, Multiple threaded (optimal)
+3313,  46 220 ms, Location 3, Resolution  1920 x  1080, Save None, Multiple threaded (optimal)
+4313, 150 894 ms, Location 4, Resolution  1920 x  1080, Save None, Multiple threaded (optimal)
+1723,   5 683 ms, Location 1, Resolution 16000 x 16000, Save Memory, Multiple threaded (optimal)
+1823,  22 105 ms, Location 1, Resolution 32000 x 32000, Save Memory, Multiple threaded (optimal)
+2523, 105 188 ms, Location 2, Resolution  7680 x  4320, Save Memory, Multiple threaded (optimal)
+```
+
+### Laptop (MSI), Intel Core i7 6700HQ, 8 Logical (4+4) , RAM 2x8 GB, SODIMM, 2133 Mhz
+```
+2111,  12 122 ms, Location 2, Resolution   640 x   480, Save None, Single threaded
+2313,  12 294 ms, Location 2, Resolution  1920 x  1080, Save None, Multiple threaded (optimal)
+3313,  92 506 ms, Location 3, Resolution  1920 x  1080, Save None, Multiple threaded (optimal)
+4313, 282 490 ms, Location 4, Resolution  1920 x  1080, Save None, Multiple threaded (optimal)
+1723,   9 354 ms, Location 1, Resolution 16000 x 16000, Save Memory, Multiple threaded (optimal)
+1823,  35 796 ms, Location 1, Resolution 32000 x 32000, Save Memory, Multiple threaded (optimal)
+2523, 192 768 ms, Location 2, Resolution  7680 x  4320, Save Memory, Multiple threaded (optimal)
+```
+
+### Laptop (Asus), Intel Core i5 2450M, 4 Logical Cores, RAM 6 GB
+```
+2111,  15 740 ms, Location 2, Resolution   640 x   480, Save None, Single threaded
+2313,  32 698 ms, Location 2, Resolution  1920 x  1080, Save None, Multiple threaded (optimal)
+1723,  21 029 ms, Location 1, Resolution 16000 x 16000, Save Memory, Multiple threaded (optimal)
+2523, 492 494 ms, Location 2, Resolution  7680 x  4320, Save Memory, Multiple threaded (optimal)
+```
+
+### General return values
+```
+1223, Alloc   3,5 mb, Iteration Min      1, Max       989, MaxIter reached     49 045
+2323, Alloc   7,9 mb, Iteration Min  9 043, Max    23 452, MaxIter reached          0
+3223, Alloc   3,5 mb, Iteration Min 42 104, Max   301 127, MaxIter reached          0
+4223, Alloc   3,5 mb, Iteration Min  7 748, Max 1 499 907, MaxIter reached     94 484
+1723, Alloc 976,6 mb, Iteration Min      1, Max       999, MaxIter reached 24 166 805
+1823, Alloc   3,8 gb, Iteration Min      1, Max       999, MaxIter reached 96 665 047
+2523, Alloc 126,6 mb, Iteration Min  9 043, Max    31 782, MaxIter reached          0
 ```
