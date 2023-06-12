@@ -18,7 +18,7 @@ Included utilty (FractRaw2Png) to convert the saved raw dump to PNG.
 
 ## ToDo
 
-- enter x / y location, diff and max iteration
+- somehow be able to enter x / y location, diff and max iteration other than the 4 included with the program
 
 ## Example of usage
 
@@ -42,17 +42,31 @@ Using FractBench with arguments is using the same notation like the input entere
 
 FractBench 1353
 
-'1' Location 1 (famous Mandelbrot fractal starting location), '3' a 1080p image, '5' create output.dat file, '3' multi threaded calculation.
+'1' Location 1 (normal / fast calculation intensity; famous Mandelbrot fractal starting location)
+
+'3' a 1080p image (1920 x 1080)
+
+'5' create output.dat file
+
+'3' multi threaded calculation
 
 FractRaw2Png 1920 1080
 
-In the same directory after running the previous command will create output.png from output.dat
-but typically to get better quality one would downsample (biqubic, bilinear, adaptive, ..) a larger image.
+From the same directory after running the previous command (or move the output.dat to the same directory as FractRaw2Png executable is in)
+will create output.png from output.dat using the same resolution.
 
-To get 1080p better quality instead generate 4k image then downsample (feature not included in FractRaw2Png).
+To get 1080p better quality instead generate 4k or 8k image (3840 x 2160 or 7680 x 4320) then downsample (biqubic, bilinear, adaptive or similar) to 1080p (feature not included in FractRaw2Png).
 
 ### Example 2
 
 FractBench 223103
 
-'2' Location 2, '2' a 720p image, '3' not saved to memory but with repeat, '10' repeat 10 times, '3' multi threaded calculation.
+'2' Location 2 (medium calculation intensity)
+
+'2' a 720p image (1280 x 720)
+
+'3' not saved to memory but with repeat
+
+'10' repeat 10 times
+
+'3' multi threaded calculation
