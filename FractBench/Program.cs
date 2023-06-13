@@ -61,13 +61,13 @@ namespace FractBench
             while (true) // Continue until user press 0 or ESC during input or ctrl c at any time
             {
                 Console.WriteLine();
-                Console.Write("Select location [1. Standard 2. Low 3. Medium 4. High] ");
-                var intLoc = ReadNumber(4);
+                Console.Write("Select location [1. Standard, 2. Low, 3. Medium, 4. High, 5. Free] ");
+                var intLoc = ReadNumber(5);
 
-                Console.Write("Select resolution [1. 480p 2. 720p 3. 1080p 4. 4k, 5. 8k, 6. 3x3 4k 7. memtest1, 8. memtest2] ");
+                Console.Write("Select resolution [1. 480p, 2. 720p, 3. 1080p, 4. 4k, 5. 8k, 6. 3x3 4k, 7. memtest1, 8. memtest2] ");
                 var intScrRes = ReadNumber(8);
 
-                Console.Write("Select save [1. None 2. Memory 3. None with repeat 4. Memory with repeat 5. File] ");
+                Console.Write("Select save [1. None, 2. Memory, 3. None with repeat, 4. Memory with repeat, 5. File] ");
                 var intSave = ReadNumber(5);
                 var intRepeatNum = -1;
 
@@ -79,7 +79,7 @@ namespace FractBench
                     intRepeatNum = num1 == 0 && num2 == 0 ? 100 : num1 * 10 + num2;
                 }
 
-                Console.Write("Select calculation [1. Single threaded 2. Multiple threaded (normal) 3. Multiple threaded (optimal)] ");
+                Console.Write("Select calculation [1. Single threaded, 2. Multiple threaded (normal), 3. Multiple threaded (optimal)] ");
                 var intCalcMode = ReadNumber(3);
 
                 FractalBenchmark(intLoc, xres[intScrRes - 1], yres[intScrRes - 1], intSave, intRepeatNum, intCalcMode);
@@ -99,8 +99,13 @@ namespace FractBench
                     bench = new Bench(-1.39415229360722, -0.00180321371397862, 0.000000000000454747350886464, 50000);
                 else if (intLoc == 3)
                     bench = new Bench(0.251106774256728, -0.0000724877441406802, 0.000000002, 500000);
-                else
+                else if (intLoc == 4)
                     bench = new Bench(0.339309693454861, -0.570137012708333, 0.00000000625, 1500000);
+                else
+                {
+                    bench = new Bench(out bool bolReadFile);
+                    intLoc = bolReadFile ? 5 : 1;
+                }
 
                 var dteBeg = DateTime.Now;
                 bench.FixCorr(intX, intY);
@@ -131,7 +136,7 @@ namespace FractBench
 
                     foreach (var item in data)
                     {
-                        var intVal = ((List<int>)item).Where(z => z < Bench.MAXITER).Max();
+                        var intVal = ((List<int>)item).Where(z => z < Bench.MAXITER).Any() ? ((List<int>)item).Where(z => z < Bench.MAXITER).Max() : -1;
                         lngMaxiter += ((List<int>)item).Where(z => z == Bench.MAXITER).Count();
 
                         if (intVal > intMax)
@@ -142,6 +147,9 @@ namespace FractBench
                         if (intMin == -1 || intVal < intMin)
                             intMin = intVal;
                     }
+
+                    if (intMax == -1)
+                        intMax = Bench.MAXITER;
 
                     var dblAlloc = (double)lngAlloc;
                     int i;
@@ -245,6 +253,46 @@ namespace FractBench
 
         public Bench()
         {
+        }
+
+        public Bench(out bool bolReadFile)
+        {
+            bolReadFile = false;
+
+            if (!File.Exists("location.txt"))
+                return;
+
+            try
+            {
+                List<string> arrFile = new List<string>();
+                using (var sr = new StreamReader("location.txt"))
+                {
+                    arrFile = sr.ReadToEnd().Replace("\n", "").Split('\r').ToList();
+                    sr.Close();
+                }
+
+                if (arrFile.Count < 4)
+                    return;
+                if (!double.TryParse(arrFile[0], out double x))
+                    return;
+                if (!double.TryParse(arrFile[1], out double y))
+                    return;
+                if (!double.TryParse(arrFile[2], out double diff))
+                    return;
+                if (!Int32.TryParse(arrFile[3], out int maxIter))
+                    return;
+
+                bolReadFile = true;
+                dblXp = x;
+                dblYp = y;
+                dblDiff = diff;
+
+                if (intCurrentMaxIter >= 1)
+                    intCurrentMaxIter = maxIter;
+            }
+            catch
+            {
+            }
         }
 
         public Bench(double x, double y, double diff, int maxIter)
