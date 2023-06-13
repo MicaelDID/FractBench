@@ -16,15 +16,22 @@ Using
 
 Included utilty (FractRaw2Png) to convert the saved raw dump to PNG.
 
-## ToDo
-
-- somehow be able to enter x / y location, diff and max iteration other than the 4 included with the program
-
 ## Example of usage
 
 Starting FractBench without arguments is very descriptive. Just enter your selections from the presented alternatives.
 
 Of the selectable starting locations 1 to 4 they need different processing time to be calculated, with 1 the fastest and 4 the slowest.
+Location 5 makes it possible to read from location.txt what to process. If the file could be read its presented as location 5 otherwise 1.
+
+Example of location.txt that on each new line contains: center x location, center y location, diff or width / height at the specified location, max iterations
+```
+-0,545205229166666
+-0,601145622083333
+0,0000005
+5000
+```
+
+Note: depending on your windows localization settings it maybe be . instead of , that is used as decimal point.
 
 The size of the generated fractal would also affect total processing time, as well as single threaded (slower) compared to multi threaded (faster).
 
