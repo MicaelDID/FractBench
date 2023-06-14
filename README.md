@@ -163,7 +163,7 @@ FractBench 2523
 
 Note: Slow, did not run all
 
-### Raspberry Pi 3 Model B+, Broadcom BCM2837, 4 Logical Cores, RAM 1 GB
+### Raspberry Pi 3 Model B+, ARM Cortex-A72, 4 Logical Cores, RAM 1 GB
 ```
 2111, 169 453 ms, Location 2, Resolution   640 x  480, Save None, Single threaded
 2313, 347 103 ms, Location 2, Resolution  1920 x 1080, Save None, Multiple threaded (optimal)
