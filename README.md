@@ -23,7 +23,13 @@ Starting FractBench without arguments is very descriptive. Just enter your selec
 Of the selectable starting locations 1 to 4 they need different processing time to be calculated, with 1 the fastest and 4 the slowest.
 Location 5 makes it possible to read from location.txt what to process. If the file could be read its presented as location 5 otherwise 1.
 
-Example of location.txt that on each new line contains: center x location, center y location, diff or width / height at the specified location, max iterations
+The location.txt is defined by different numbers separated by a new line. Those are (in exact this order):
+- center x location
+- center y location
+- diff or width / height at the specified location
+- max iterations
+
+Example of location.txt
 ```
 -0,545205229166666
 -0,601145622083333
@@ -31,7 +37,7 @@ Example of location.txt that on each new line contains: center x location, cente
 5000
 ```
 
-Note: depending on your windows localization settings it maybe be . instead of , that is used as decimal point.
+Note: depending on your windows localization settings the decimal point maybe be . instead.
 
 The size of the generated fractal would also affect total processing time, as well as single threaded (slower) compared to multi threaded (faster).
 
