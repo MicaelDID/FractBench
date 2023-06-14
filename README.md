@@ -1,6 +1,6 @@
 # FractBench
 
-Simple Fractal Benchmark program, console based, .NET Framework 4.7.x (project mono compatible?)
+Simple Fractal Benchmark program, console based, .NET Framework 4.7.x (project mono compatible)
 
 ## Features
 
@@ -160,6 +160,19 @@ FractBench 2523
 1723,  21 029 ms, Location 1, Resolution 16000 x 16000, Save Memory, Multiple threaded (optimal)
 2523, 492 494 ms, Location 2, Resolution  7680 x  4320, Save Memory, Multiple threaded (optimal)
 ```
+
+Note: Slow, did not run all
+
+### Raspberry Pi 3 Model B+, Broadcom BCM2837, 4 Logical Cores, RAM 1 GB
+```
+2111, 169 453 ms, Location 2, Resolution   640 x  480, Save None, Single threaded
+2313, 347 103 ms, Location 2, Resolution  1920 x 1080, Save None, Multiple threaded (optimal)
+1423,   4 685 ms, Location 1, Resolution  3840 x 2160, Save Memory, Multiple threaded (optimal)
+1523,  16 898 ms, Location 1, Resolution  3840 x 2160, Save Memory, Multiple threaded (optimal)
+2323, 333 600 ms, Location 2, Resolution  1920 x 1080, Save Memory, Multiple threaded (optimal)
+```
+
+Note: Very slow, did not run all (also due to lack of memory - killed!) but also added some variants
 
 ### General return values
 ```
