@@ -81,7 +81,18 @@ FractBench 223103
 
 ## Results
 
-### Desktop, AMD Ryzen9 5950X, 32 Logical cores (16+16), RAM 2x16 GB, DIMM, 2133 Mhz
+Build for Release, create and run a batch file like this (or just paste this into the command prompt).
+```
+FractBench 2111
+FractBench 2313
+FractBench 3313
+FractBench 4313
+FractBench 1723
+FractBench 1823
+FractBench 2523
+```
+
+### Desktop, AMD Ryzen9 5950X, 32 Logical Cores (16+16), RAM 2x16 GB, DIMM, 2133 Mhz
 ```
  2111,  5 845 ms, Location 2, Resolution   640 x   480, Save None, Single threaded
  2313,  1 712 ms, Location 2, Resolution  1920 x  1080, Save None, Multiple threaded (optimal)
