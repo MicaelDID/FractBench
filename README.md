@@ -161,7 +161,7 @@ FractBench 2523
 2523, 492 494 ms, Location 2, Resolution  7680 x  4320, Save Memory, Multiple threaded (optimal)
 ```
 
-Note: Slow, did not run all
+Note: A bit slow, did not run all
 
 ### Raspberry Pi 3 Model B+, ARM Cortex-A72, 4 Logical Cores, RAM 1 GB
 ```
@@ -172,7 +172,9 @@ Note: Slow, did not run all
 2323, 333 600 ms, Location 2, Resolution  1920 x 1080, Save Memory, Multiple threaded (optimal)
 ```
 
-Note: Very slow, did not run all (also due to lack of memory - killed!) but also added some variants
+Installed Mono, running from command line with "mono FractBench.exe"
+
+Note: Slow, did not run all (also due to lack of memory - killed!) but also added some variants
 
 ### General return values
 ```
