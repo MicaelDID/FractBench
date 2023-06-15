@@ -5,12 +5,14 @@ Simple Fractal Benchmark program, console based, .NET Framework 4.7.x (project m
 ## Features
 
 Using
-- either command line arguments or console key press
+- command line arguments or selected by number keys
 - integer / double math operations for Mandelbrot fractal calculations
 - singel- or multithreaded code
 - with / without allocating memory
 - save to file option (raw dump of iterations in each coordinate, needs reprocessing for generating an image)
 - with / without repeats (1-99 or endless)
+
+Note: 0 as input or ctrl c (at any time) to exit the program.
 
 ## Utility
 
@@ -18,10 +20,10 @@ Included utilty (FractRaw2Png) to convert the saved raw dump to PNG.
 
 ## Example of usage
 
-Starting FractBench without arguments is very descriptive. Just enter your selections from the presented alternatives.
+Starting FractBench without arguments is very intuitive; just enter from the presented alternatives.
 
 Of the selectable starting locations 1 to 4 they need different processing time to be calculated, with 1 the fastest and 4 the slowest.
-Location 5 makes it possible to read from location.txt what to process. If the file could be read its presented as location 5 otherwise 1.
+Location 5 makes it possible to read your own selected from the file location.txt and then process it. If the file could be read its presented as location 5 otherwise 1.
 
 The location.txt is defined by different numbers separated by a new line. Those are (in exact this order):
 - center x location
@@ -37,7 +39,7 @@ Example of location.txt
 5000
 ```
 
-Note: depending on your windows localization settings the decimal point maybe be . instead.
+Note: depending on your windows localization settings the decimal point might be . instead.
 
 The size of the generated fractal would also affect total processing time, as well as single threaded (slower) compared to multi threaded (faster).
 
@@ -48,7 +50,7 @@ When using save to memory the code will allocate enough memory to store the whol
 or if you select none then memory usage will be less of a factor comparing different computers total execution times. Extended information about
 about allocated memory, min / max iterations and how many times max iterations was reached are displayed.
 
-The idea of repeating the same selected options several times is to find an average or perhaps a lowest execution time, for example running it 10 times.
+The idea of repeating the same selected options several times is to find an average or perhaps a lowest execution time, by running it for example 10 times.
 
 Using FractBench with arguments is using the same notation like the input entered with the program without arguments.
 
@@ -87,7 +89,8 @@ FractBench 223103
 
 ## Results
 
-Build for Release, create and run a batch file like this (or just paste this into the command prompt).
+Build for Release, create and run a batch file like this (or just paste this into the command prompt) for comparable benchmark with the results listed below.
+Also feel free to try other combinations.
 ```
 FractBench 2111
 FractBench 2313
