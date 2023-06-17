@@ -4,6 +4,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FractBench
@@ -12,7 +13,7 @@ namespace FractBench
     {
         static List<int> xres = new List<int> { 640, 1280, 1920, 3840, 7680, 3 * 3840, 16000, 32000 };
         static List<int> yres = new List<int> { 480, 720, 1080, 2160, 4320, 3 * 2160, 16000, 32000 };
-        static List<string> lstModes = new List<string> { "Single threaded", "Multiple threaded (normal)", "Multiple threaded (optimal)" };
+        static List<string> lstModes = new List<string> { "Single threaded", "Multiple threaded (normal)", "Multiple threaded (optimal)", "Multiple threaded (free)" };
         static List<string> lstSaves = new List<string> { "None", "Memory", "None", "Memory", "File" };
         static List<string> lstUnits = new List<string> { "b", "kb", "mb", "gb", "tb" };
 
@@ -21,7 +22,7 @@ namespace FractBench
             Console.WriteLine($"Simple Fractal Benchmark");
             Console.WriteLine($"Logical processors: {Environment.ProcessorCount}");
 
-            if (args.Length > 1 || (args.Length == 1 && !(args[0].Length == 4 || args[0].Length == 6)))
+            if (args.Length > 1 || (args.Length == 1 && args[0].Length < 4))
             {
                 Console.WriteLine($"Incorrect number of arguments or incorrect argument");
                 return;
@@ -31,30 +32,43 @@ namespace FractBench
                 var intLoc = (int)(args[0][0] - '0');
                 var intScrRes = (int)(args[0][1] - '0');
                 var intSave = (int)(args[0][2] - '0');
-                int intRepeatNum = -1, intNum1 = -1, intNum2 = -1, intIdx = 3;
-                if (intSave == 3 || intSave == 4)
+                int intRepeatNum = -1, intNum1 = -1, intNum2 = -1, intNum3 = -1, intIdx = 3;
+                if (args[0].Length >= 6 && (intSave == 3 || intSave == 4))
                 {
                     intNum1 = (int)(args[0][3] - '0');
                     intNum2 = (int)(args[0][4] - '0');
+                    intRepeatNum = intNum1 == 0 && intNum2 == 0 ? 100 : intNum1 * 10 + intNum2;
+                    intIdx = 5;
 
                     if (intNum1 < 0 || intNum1 > 9 || intNum2 < 0 || intNum2 > 9)
                     {
                         Console.WriteLine($"Incorrect argument");
                         return;
                     }
-
-                    intRepeatNum = intNum1 == 0 && intNum2 == 0 ? 100 : intNum1 * 10 + intNum2;
-                    intIdx = 5;
                 }
-                var intCalcMode = (int)(args[0][intIdx] - '0');
+                int intCalcMode = (int)(args[0][intIdx] - '0'), intCalcFree = 0;
 
-                if (intLoc < 1 || intLoc > 4 || intScrRes < 1 || intScrRes > 8 || intSave < 1 || intSave > 5 || intCalcMode < 1 || intCalcMode > 3)
+                if (args[0].Length >= (intIdx == 3 ? 7 : 9) && intCalcMode == 4)
+                {
+                    intNum1 = (int)(args[0][intIdx + 1] - '0');
+                    intNum2 = (int)(args[0][intIdx + 2] - '0');
+                    intNum3 = (int)(args[0][intIdx + 3] - '0');
+                    intCalcFree = intNum1 * 100 + intNum2 * 10 + intNum3;
+
+                    if (intNum1 < 0 || intNum1 > 9 || intNum2 < 0 || intNum2 > 9 || intNum3 < 0 || intNum3 > 9 || intCalcFree <= 1)
+                    {
+                        Console.WriteLine($"Incorrect argument");
+                        return;
+                    }
+                }
+
+                if (intLoc < 1 || intLoc > 4 || intScrRes < 1 || intScrRes > 8 || intSave < 1 || intSave > 5 || intCalcMode < 1 || intCalcMode > 4)
                 {
                     Console.WriteLine($"Incorrect argument");
                     return;
                 }
 
-                FractalBenchmark(intLoc, xres[intScrRes - 1], yres[intScrRes - 1], intSave, intRepeatNum, intCalcMode);
+                FractalBenchmark(intLoc, xres[intScrRes - 1], yres[intScrRes - 1], intSave, intRepeatNum, intCalcMode, intCalcFree);
                 return;
             }
 
@@ -68,8 +82,7 @@ namespace FractBench
                 var intScrRes = ReadNumber(8);
 
                 Console.Write("Select save [1. None, 2. Memory, 3. None with repeat, 4. Memory with repeat, 5. File] ");
-                var intSave = ReadNumber(5);
-                var intRepeatNum = -1;
+                int intSave = ReadNumber(5), intRepeatNum = -1;
 
                 if (intSave == 3 || intSave == 4)
                 {
@@ -79,14 +92,25 @@ namespace FractBench
                     intRepeatNum = num1 == 0 && num2 == 0 ? 100 : num1 * 10 + num2;
                 }
 
-                Console.Write("Select calculation [1. Single threaded, 2. Multiple threaded (normal), 3. Multiple threaded (optimal)] ");
-                var intCalcMode = ReadNumber(3);
+                Console.Write("Select multithreading [1. Single, 2. Multiple (normal), 3. Multiple (optimal), 4. Multiple (free)] ");
+                int intCalcMode = ReadNumber(4), intCalcFree = 0;
 
-                FractalBenchmark(intLoc, xres[intScrRes - 1], yres[intScrRes - 1], intSave, intRepeatNum, intCalcMode);
+                if (intCalcMode == 4)
+                {
+                    Console.Write("Select number of threads [002-999] ");
+                    var num1 = ReadNumber(9, false, false);
+                    var num2 = ReadNumber(9, false, false);
+                    var num3 = ReadNumber(9, false);
+                    intCalcFree = num1 * 100 + num2 * 10 + num3;
+                    if (intCalcFree <= 1)
+                        return;
+                }
+
+                FractalBenchmark(intLoc, xres[intScrRes - 1], yres[intScrRes - 1], intSave, intRepeatNum, intCalcMode, intCalcFree);
             }
         }
 
-        static void FractalBenchmark(int intLoc, int intX, int intY, int intSave, int intRepeatNum, int intCalcMode)
+        static void FractalBenchmark(int intLoc, int intX, int intY, int intSave, int intRepeatNum, int intCalcMode, int intCalcFree)
         {
             Bench bench;
             object[] data = null;
@@ -122,8 +146,10 @@ namespace FractBench
                     bench.DrawNormal(intX, intY, data);
                 else if (intCalcMode == 2)
                     bench.DrawParallel(intX, intY, data, -1);
-                else
+                else if (intCalcMode == 3)
                     bench.DrawParallel(intX, intY, data, Environment.ProcessorCount * 2);
+                else
+                    bench.DrawParallel(intX, intY, data, intCalcFree);
 
                 var dteEnd = DateTime.Now;
                 Console.WriteLine($"Location {intLoc}, Resolution {intX} x {intY}, Save {lstSaves[intSave - 1]}, {lstModes[intCalcMode - 1]}, Elapsed {dteEnd.Subtract(dteBeg).TotalMilliseconds:###,###,###,##0} ms");
@@ -249,7 +275,7 @@ namespace FractBench
         private object objLock = new object();
         private int intCurrentMaxIter = 1000;
         private double dblXp = 0, dblYp = 0, dblDiff = 4.0, dblXcorr = 1.0, dblYcorr = 1.0;
-        private List<string> lstProgress = new List<string> { " ", ".", "-", "=", "*", "#" }; // 0, 1-9, 10-19, 20-29, 30-38, 39
+        private List<string> lstProgress = new List<string> { " ", ".", "-", "=", "*", "#" }; // for example 0, 1-9, 10-19, 20-29, 30-38, 39
 
         public Bench()
         {
@@ -264,7 +290,7 @@ namespace FractBench
 
             try
             {
-                List<string> arrFile = new List<string>();
+                var arrFile = new List<string>();
                 using (var sr = new StreamReader("location.txt"))
                 {
                     arrFile = sr.ReadToEnd().Replace("\n", "").Split('\r').ToList();
@@ -329,11 +355,8 @@ namespace FractBench
         private int MaxMandel(double dblReal, double dblImag)
         {
             int intCount = intCurrentMaxIter;
-            double dblRe = dblReal, dblIm = dblImag;
-            double dblRe2, dblIm2, dblReIm2;
-
-            // Periodicity Checking
-            double dblPrevReal = dblReal, dblPrevImag = dblImag;
+            double dblRe = dblReal, dblIm = dblImag, dblRe2, dblIm2, dblReIm2;
+            double dblPrevReal = dblReal, dblPrevImag = dblImag; // Periodicity Checking
             int n1 = 0; int n2 = 8;
 
             do
@@ -366,12 +389,9 @@ namespace FractBench
             return intCurrentMaxIter - intCount;
         }
 
-        private static IEnumerable<int> SteppedIterator(int intStartIndex, int intEndIndex)
+        private static IEnumerable<int> SteppedIterator(int intStartIndex, int intEndIndex) // Insanely more fun than: for (int i = intStartIndex; i < intEndIndex; i++) yield return i;
         {
-            // Insanely more fun than: for (int i = intStartIndex; i < intEndIndex; i++) yield return i;
-            int intDiff = intEndIndex - intStartIndex;
-
-            for (int i = 0, n = 0, m = 0; i < intDiff; i++)
+            for (int i = 0, n = 0, m = 0, intDiff = intEndIndex - intStartIndex; i < intDiff; i++)
             {
                 int v = (n * 8 + m) % intDiff;
                 yield return v + intStartIndex;
@@ -386,12 +406,13 @@ namespace FractBench
             }
         }
 
-        // Multiple threaded loop using Parallel.For
-        public void DrawParallel(int intPicWidth, int intPicHeight, object[] data, int intDegreeOfParallelism)
+        public void DrawParallel(int intPicWidth, int intPicHeight, object[] data, int intDegreeOfParallelism) // Multiple threaded loop using Parallel.For
         {
+            int intTotal = 0;
             var arrFlag = new bool[intPicHeight];
             var pOptions = new ParallelOptions { TaskScheduler = null, MaxDegreeOfParallelism = intDegreeOfParallelism };
-            int intTotal = 0;
+            ThreadPool.GetMinThreads(out int minWorker, out int minIOC);
+            ThreadPool.SetMinThreads(intDegreeOfParallelism == -1 ? Environment.ProcessorCount : intDegreeOfParallelism, minIOC); // do we need to set this?
 
             Parallel.ForEach(SteppedIterator(0, intPicHeight), pOptions, (j, loopState) =>
             {
@@ -427,8 +448,7 @@ namespace FractBench
             }
         }
 
-         // Single threaded loop
-        public void DrawNormal(int intPicWidth, int intPicHeight, object[] data)
+        public void DrawNormal(int intPicWidth, int intPicHeight, object[] data) // Single threaded loop
         {
             for (int j = 0; j < intPicHeight; j++)
             {
