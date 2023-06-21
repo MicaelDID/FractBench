@@ -1,6 +1,6 @@
 # FractBench
 
-Simple Fractal Benchmark program, console based, .NET Framework 4.7.x (project mono compatible)
+Simple Fractal Benchmark program (in less than 550 lines), console based, .NET Framework 4.7.x (project mono compatible)
 
 ## Features
 
