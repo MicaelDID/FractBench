@@ -32,7 +32,7 @@ namespace FractBench
                 var intLoc = (int)(args[0][0] - '0');
                 var intScrRes = (int)(args[0][1] - '0');
                 var intSave = (int)(args[0][2] - '0');
-                int intRepeatNum = -1, intNum1 = -1, intNum2 = -1, intNum3 = -1, intIdx = 3;
+                int intRepeatNum = -1, intNum1, intNum2, intNum3, intIdx = 3;
                 if (args[0].Length >= 6 && (intSave == 3 || intSave == 4))
                 {
                     intNum1 = (int)(args[0][3] - '0');
@@ -86,10 +86,9 @@ namespace FractBench
 
                 if (intSave == 3 || intSave == 4)
                 {
-                    Console.Write("Select repeat number [01-99 or 00 for endless] ");
-                    var num1 = ReadNumber(9, false, false);
-                    var num2 = ReadNumber(9, false);
-                    intRepeatNum = num1 == 0 && num2 == 0 ? 100 : num1 * 10 + num2;
+                    Console.Write("Select repeat number [1-99 or 00 for endless] ");
+                    intRepeatNum = ReadNumber(9, 2);
+                    intRepeatNum = intRepeatNum == 0 ? 100 : intRepeatNum;
                 }
 
                 Console.Write("Select multithreading [1. Single, 2. Multiple (normal), 3. Multiple (optimal), 4. Multiple (free)] ");
@@ -97,11 +96,9 @@ namespace FractBench
 
                 if (intCalcMode == 4)
                 {
-                    Console.Write("Select number of threads [002-999] ");
-                    var num1 = ReadNumber(9, false, false);
-                    var num2 = ReadNumber(9, false, false);
-                    var num3 = ReadNumber(9, false);
-                    intCalcFree = num1 * 100 + num2 * 10 + num3;
+                    Console.Write("Select number of threads [2-999] ");
+                    intCalcFree = ReadNumber(9, 3);
+
                     if (intCalcFree <= 1)
                         return;
                 }
@@ -114,6 +111,7 @@ namespace FractBench
         {
             Bench bench;
             object[] data = null;
+            int intNum = 1;
 
             while (true)
             {
@@ -152,7 +150,9 @@ namespace FractBench
                     bench.DrawParallel(intX, intY, data, intCalcFree);
 
                 var dteEnd = DateTime.Now;
-                Console.WriteLine($"Location {intLoc}, Resolution {intX} x {intY}, Save {lstSaves[intSave - 1]}, {lstModes[intCalcMode - 1]}, Elapsed {dteEnd.Subtract(dteBeg).TotalMilliseconds:###,###,###,##0} ms");
+                string strRepeat = (intRepeatNum > 1 ? $"{intNum++}: ".PadLeft(3 + (int)Math.Log10(intRepeatNum)) : string.Empty);
+                string strFree = intCalcMode == 4 ? $", {intCalcFree} threads" : string.Empty;
+                Console.WriteLine($"{strRepeat}Location {intLoc}, Resolution {intX} x {intY}, Save {lstSaves[intSave - 1]}, {lstModes[intCalcMode - 1]}{strFree}, Elapsed {dteEnd.Subtract(dteBeg).TotalMilliseconds:###,###,###,##0} ms");
                 bench = null;
 
                 if (data != null)
@@ -195,7 +195,7 @@ namespace FractBench
                 if (intSave == 1 || intSave == 2 || intSave == 5)
                     break;
 
-                if (intRepeatNum < 100 && --intRepeatNum <= 0)
+                if (intRepeatNum < 100 && intNum > intRepeatNum)
                     break;
 
                 if (data != null && (intSave == 2 || intSave == 4 || intSave == 5))
@@ -203,7 +203,7 @@ namespace FractBench
             }
 
             if (data != null && intSave == 5)
-                SaveData(data, intX, intY);
+                SaveData(data, intX);
 
             if (data != null && (intSave == 2 || intSave == 4 || intSave == 5))
                 ClearData(data, intY);
@@ -217,7 +217,7 @@ namespace FractBench
             data = null;
         }
 
-        static void SaveData(object[] data, int x, int y)
+        static void SaveData(object[] data, int x)
         {
             using (var stream = new FileStream("output.dat", FileMode.Create, FileAccess.Write, FileShare.None))
             using (var writer = new BinaryWriter(stream))
@@ -242,26 +242,37 @@ namespace FractBench
             }
         }
 
-        static int ReadNumber(int intMax, bool bolZeroFlag = true, bool bolNewLine = true)
+        static int ReadNumber(int intMax, int intDigits = 1)
         {
-            int ret;
+            int i = 1, ret = 0;
 
-            do
+            for (int num = 0; i <= intDigits; ret = ret * 10 + num)
             {
                 var key = Console.ReadKey(true);
 
-                if (key.KeyChar == (char)27 || key.KeyChar == (char)13)
+                if (key.KeyChar == (char)27 || (i == 1 && key.KeyChar == (char)13))
                     Environment.Exit(0);
 
-                ret = (int)(key.KeyChar - '0');
-            } while (!(ret >= 0 && ret <= intMax));
+                if (key.KeyChar == (char)8 || (key.KeyChar == ' ' && i == 1))
+                    continue;
 
-            if (bolNewLine)
-                Console.WriteLine($"{ret}");
-            else
-                Console.Write($"{ret}");
+                if (key.KeyChar == ' ' || (i > 1 && key.KeyChar == (char)13))
+                {
+                    Console.WriteLine();
+                    break;
+                }
 
-            if (bolZeroFlag && ret == 0)
+                num = (int)(key.KeyChar - '0');
+
+                Console.Write($"{num}{(i < intDigits ? "" : Environment.NewLine)}");
+
+                if (num < 0 || num > intMax)
+                    return ret;
+
+                i++;
+            }
+
+            if (intDigits == 1 && ret == 0)
                 Environment.Exit(0);
 
             return ret;
@@ -305,7 +316,7 @@ namespace FractBench
                     return;
                 if (!double.TryParse(arrFile[2], out double diff))
                     return;
-                if (!Int32.TryParse(arrFile[3], out int maxIter))
+                if (!int.TryParse(arrFile[3], out int maxIter))
                     return;
 
                 bolReadFile = true;
@@ -412,7 +423,10 @@ namespace FractBench
             var arrFlag = new bool[intPicHeight];
             var pOptions = new ParallelOptions { TaskScheduler = null, MaxDegreeOfParallelism = intDegreeOfParallelism };
             ThreadPool.GetMinThreads(out int minWorker, out int minIOC);
-            ThreadPool.SetMinThreads(intDegreeOfParallelism == -1 ? Environment.ProcessorCount : intDegreeOfParallelism, minIOC); // do we need to set this?
+            var intNewWorker = intDegreeOfParallelism == -1 ? Environment.ProcessorCount : intDegreeOfParallelism;
+
+            if (intNewWorker != minWorker)
+                ThreadPool.SetMinThreads(intNewWorker, minIOC); // do we need to set this?
 
             Parallel.ForEach(SteppedIterator(0, intPicHeight), pOptions, (j, loopState) =>
             {
