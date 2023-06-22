@@ -253,14 +253,14 @@ namespace FractBench
                 if (key.KeyChar == (char)27 || (i == 1 && key.KeyChar == (char)13))
                     Environment.Exit(0);
 
-                if (key.KeyChar == (char)8 || (key.KeyChar == ' ' && i == 1))
-                    continue;
-
-                if (key.KeyChar == ' ' || (i > 1 && key.KeyChar == (char)13))
+                if (i > 1 && (key.KeyChar == ' ' || key.KeyChar == (char)13))
                 {
                     Console.WriteLine();
                     break;
                 }
+
+                if (key.KeyChar == (char)8 || (key.KeyChar == ' ' && i == 1) || key.KeyChar < '0' || key.KeyChar > '9')
+                    continue;
 
                 num = (int)(key.KeyChar - '0');
 
