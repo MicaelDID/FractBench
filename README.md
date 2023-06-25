@@ -1,6 +1,11 @@
 # FractBench
 
 Simple Fractal Benchmark program (in less than 550 lines), console based, .NET Framework 4.7.x (project mono compatible)
+to measure CPU performance.
+
+Note: that depending on for how complicated the calculations are the results between different CPUs might differ, so to
+create combined single value one would have to execute several different calculations and use a weight on each but for
+now I leave that task up for you to solve.
 
 ## Features
 
