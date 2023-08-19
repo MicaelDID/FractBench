@@ -179,10 +179,16 @@ Note: A bit slow, did not run all
 
 ### Raspberry Pi 3 Model B+, ARM Cortex-A72, 4 Logical Cores, RAM 1 GB
 ```
-2111, 169 453 ms, Location 2, Resolution   640 x  480, Save None, Single threaded
+2111, 143 992 ms, Location 2, Resolution   640 x  480, Save None, Single threaded
+2112,  43 520 ms, Location 2, Resolution   640 x  480, Save None, Multiple threaded (normal)
+2113,  44 659 ms, Location 2, Resolution   640 x  480, Save None, Multiple threaded (optimal)
 2313, 347 103 ms, Location 2, Resolution  1920 x 1080, Save None, Multiple threaded (optimal)
-1423,   4 685 ms, Location 1, Resolution  3840 x 2160, Save Memory, Multiple threaded (optimal)
-1523,  16 898 ms, Location 1, Resolution  3840 x 2160, Save Memory, Multiple threaded (optimal)
+1421,  11 035 ms, Location 1, Resolution  3840 x 2160, Save Memory, Single threaded
+1422,   3 670 ms, Location 1, Resolution  3840 x 2160, Save Memory, Multiple threaded (normal)
+1423,   3 562 ms, Location 1, Resolution  3840 x 2160, Save Memory, Multiple threaded (optimal)
+1521,  45 901 ms, Location 1, Resolution  7680 x 4320, Save Memory, Single threaded
+1522,  16 237 ms, Location 1, Resolution  7680 x 4320, Save Memory, Multiple threaded (normal)
+1523,  15 941 ms, Location 1, Resolution  7680 x 4320, Save Memory, Multiple threaded (optimal)
 2323, 333 600 ms, Location 2, Resolution  1920 x 1080, Save Memory, Multiple threaded (optimal)
 ```
 
