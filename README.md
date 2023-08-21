@@ -123,6 +123,17 @@ FractBench 2523
  2523, 27 565 ms, Location 2, Resolution  7680 x  4320, Save Memory, Multiple threaded (optimal)
 ```
 
+### Laptop (HP), Intel Core i9 10885H, 16 Logical Cores (8+8), RAM 2x16 GB, SODIMM, 2933 Mhz
+```
+ 2111,   8 930 ms, Location 2, Resolution   640 x   480, Save None, Single threaded
+ 2313,   4 653 ms, Location 2, Resolution  1920 x  1080, Save None, Multiple threaded (optimal)
+ 3313,  36 540 ms, Location 3, Resolution  1920 x  1080, Save None, Multiple threaded (optimal)
+ 4313, 140 586 ms, Location 4, Resolution  1920 x  1080, Save None, Multiple threaded (optimal)
+ 1723,   5 504 ms, Location 1, Resolution 16000 x 16000, Save Memory, Multiple threaded (optimal)
+ 1823,  20 070 ms, Location 1, Resolution 32000 x 32000, Save Memory, Multiple threaded (optimal)
+ 2523,  82 571 ms, Location 2, Resolution  7680 x  4320, Save Memory, Multiple threaded (optimal)
+```
+
 ### Desktop, Intel Core i7 8700K, 12 Logical Cores (6+6), RAM 4x8 GB, DIMM, 2133 Mhz
 ```
 2111,   9 872 ms, Location 2, Resolution   640 x   480, Save None, Single threaded
