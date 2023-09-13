@@ -112,6 +112,7 @@ namespace FractBench
             Bench bench;
             object[] data = null;
             int intNum = 1;
+            List<double> lstTime = new List<double>();
 
             while (true)
             {
@@ -152,7 +153,9 @@ namespace FractBench
                 var dteEnd = DateTime.Now;
                 string strRepeat = (intRepeatNum > 1 ? $"{intNum++}: ".PadLeft(3 + (int)Math.Log10(intRepeatNum)) : string.Empty);
                 string strFree = intCalcMode == 4 ? $", {intCalcFree} threads" : string.Empty;
-                Console.WriteLine($"{strRepeat}Location {intLoc}, Resolution {intX} x {intY}, Save {lstSaves[intSave - 1]}, {lstModes[intCalcMode - 1]}{strFree}, Elapsed {dteEnd.Subtract(dteBeg).TotalMilliseconds:###,###,###,##0} ms");
+                double time = dteEnd.Subtract(dteBeg).TotalMilliseconds;
+                Console.WriteLine($"{strRepeat}Location {intLoc}, Resolution {intX} x {intY}, Save {lstSaves[intSave - 1]}, {lstModes[intCalcMode - 1]}{strFree}, Elapsed {time:###,###,###,##0} ms");
+                lstTime.Add(time);
                 bench = null;
 
                 if (data != null)
@@ -195,12 +198,15 @@ namespace FractBench
                 if (intSave == 1 || intSave == 2 || intSave == 5)
                     break;
 
-                if (intRepeatNum < 100 && intNum > intRepeatNum)
+                if (intRepeatNum < 1000 && intNum > intRepeatNum)
                     break;
 
                 if (data != null && (intSave == 2 || intSave == 4 || intSave == 5))
                     ClearData(data, intY);
             }
+
+            if (lstTime.Count() > 1)
+                Console.WriteLine($"Repeat summary: Count {lstTime.Count()}, Elapsed min / max / average {lstTime.Min():###,###,###,##0} ms / {lstTime.Max():###,###,###,##0} ms / {lstTime.Average():###,###,###,##0} ms");
 
             if (data != null && intSave == 5)
                 SaveData(data, intX);
