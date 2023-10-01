@@ -4,8 +4,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using DataLayer;
 
 namespace FractBench
 {
@@ -16,6 +15,7 @@ namespace FractBench
         static List<string> lstModes = new List<string> { "Single threaded", "Multiple threaded (normal)", "Multiple threaded (optimal)", "Multiple threaded (free)" };
         static List<string> lstSaves = new List<string> { "None", "Memory", "None", "Memory", "File" };
         static List<string> lstUnits = new List<string> { "b", "kb", "mb", "gb", "tb" };
+        static List<string> lstProgress = new List<string> { " ", ".", "-", "=", "*", "#" }; // for example 0, 1-9, 10-19, 20-29, 30-38, 39
 
         static void Main(string[] args)
         {
@@ -109,24 +109,25 @@ namespace FractBench
 
         static void FractalBenchmark(int intLoc, int intX, int intY, int intSave, int intRepeatNum, int intCalcMode, int intCalcFree)
         {
-            Bench bench;
+            Fractal bench;
+            var disp = new MyProgress();
             object[] data = null;
             int intNum = 1;
-            List<double> lstTime = new List<double>();
+            var lstTime = new List<double>();
 
             while (true)
             {
                 if (intLoc == 1)
-                    bench = new Bench();
+                    bench = new Fractal();
                 else if (intLoc == 2)
-                    bench = new Bench(-1.39415229360722, -0.00180321371397862, 0.000000000000454747350886464, 50000);
+                    bench = new Fractal(-1.39415229360722, -0.00180321371397862, 0.000000000000454747350886464, 50000);
                 else if (intLoc == 3)
-                    bench = new Bench(0.251106774256728, -0.0000724877441406802, 0.000000002, 500000);
+                    bench = new Fractal(0.251106774256728, -0.0000724877441406802, 0.000000002, 500000);
                 else if (intLoc == 4)
-                    bench = new Bench(0.339309693454861, -0.570137012708333, 0.00000000625, 1500000);
+                    bench = new Fractal(0.339309693454861, -0.570137012708333, 0.00000000625, 1500000);
                 else
                 {
-                    bench = new Bench(out bool bolReadFile);
+                    bench = new Fractal(out bool bolReadFile);
                     intLoc = bolReadFile ? 5 : 1;
                 }
 
@@ -138,17 +139,17 @@ namespace FractBench
                     data = new object[intY];
 
                     for (int j = 0; j < intY; j++)
-                        data[j] = Bench.Repeated(intX);
+                        data[j] = Fractal.Repeated(intX);
                 }
 
                 if (intCalcMode == 1)
-                    bench.DrawNormal(intX, intY, data);
+                    bench.DrawNormal(intX, intY, data, disp);
                 else if (intCalcMode == 2)
-                    bench.DrawParallel(intX, intY, data, -1);
+                    bench.DrawParallel(intX, intY, data, -1, disp);
                 else if (intCalcMode == 3)
-                    bench.DrawParallel(intX, intY, data, Environment.ProcessorCount * 2);
+                    bench.DrawParallel(intX, intY, data, Environment.ProcessorCount * 2, disp);
                 else
-                    bench.DrawParallel(intX, intY, data, intCalcFree);
+                    bench.DrawParallel(intX, intY, data, intCalcFree, disp);
 
                 var dteEnd = DateTime.Now;
                 string strRepeat = (intRepeatNum > 1 ? $"{intNum++}: ".PadLeft(3 + (int)Math.Log10(intRepeatNum)) : string.Empty);
@@ -165,8 +166,8 @@ namespace FractBench
 
                     foreach (var item in data)
                     {
-                        var intVal = ((List<int>)item).Where(z => z < Bench.MAXITER).Any() ? ((List<int>)item).Where(z => z < Bench.MAXITER).Max() : -1;
-                        lngMaxiter += ((List<int>)item).Where(z => z == Bench.MAXITER).Count();
+                        var intVal = ((List<int>)item).Where(z => z < Fractal.MAXITER).Any() ? ((List<int>)item).Where(z => z < Fractal.MAXITER).Max() : -1;
+                        lngMaxiter += ((List<int>)item).Where(z => z == Fractal.MAXITER).Count();
 
                         if (intVal > intMax)
                             intMax = intVal;
@@ -178,7 +179,7 @@ namespace FractBench
                     }
 
                     if (intMax == -1)
-                        intMax = Bench.MAXITER;
+                        intMax = Fractal.MAXITER;
 
                     var dblAlloc = (double)lngAlloc;
                     int i;
@@ -283,257 +284,76 @@ namespace FractBench
 
             return ret;
         }
-    }
 
-    public class Bench
-    {
-        public const int MAXITER = 2000000000;
-        public bool bolPanicQuit = false;
-        private object objLock = new object();
-        private int intCurrentMaxIter = 1000;
-        private double dblXp = 0, dblYp = 0, dblDiff = 4.0, dblXcorr = 1.0, dblYcorr = 1.0;
-        private List<string> lstProgress = new List<string> { " ", ".", "-", "=", "*", "#" }; // for example 0, 1-9, 10-19, 20-29, 30-38, 39
-
-        public Bench()
+        public class MyProgress : IProgress
         {
-        }
-
-        public Bench(out bool bolReadFile)
-        {
-            bolReadFile = false;
-
-            if (!File.Exists("location.txt"))
-                return;
-
-            try
+            public void Display(int intTotal, int intPicHeight, bool[] arrFlag)
             {
-                var arrFile = new List<string>();
-                using (var sr = new StreamReader("location.txt"))
+                if (intTotal == -1)
                 {
-                    arrFile = sr.ReadToEnd().Replace("\n", "").Split('\r').ToList();
-                    sr.Close();
+                    Console.WriteLine($"\r{new string(' ', 41 + 15)}\r{GetProgress(arrFlag, intPicHeight)} Completed 100%");
+                    return;
                 }
 
-                if (arrFile.Count < 4)
-                    return;
-                if (!double.TryParse(arrFile[0], out double x))
-                    return;
-                if (!double.TryParse(arrFile[1], out double y))
-                    return;
-                if (!double.TryParse(arrFile[2], out double diff))
-                    return;
-                if (!int.TryParse(arrFile[3], out int maxIter))
-                    return;
-
-                bolReadFile = true;
-                dblXp = x;
-                dblYp = y;
-                dblDiff = diff;
-
-                if (intCurrentMaxIter >= 1)
-                    intCurrentMaxIter = maxIter;
+                if (0 == (intTotal % 50))
+                    Console.Write($"\r{new string(' ', 41 + 15)}\r{GetProgress(arrFlag, intPicHeight)} Completed {(double)intTotal * 100d / (double)intPicHeight:0.#}%");
             }
-            catch
+
+            public void Display(int intTotal, int intPicHeight)
             {
-            }
-        }
-
-        public Bench(double x, double y, double diff, int maxIter)
-        {
-            dblXp = x;
-            dblYp = y;
-            dblDiff = diff;
-            intCurrentMaxIter = maxIter;
-        }
-
-        public static List<int> Repeated(int intCount)
-        {
-            var ret = new List<int>(intCount);
-            ret.AddRange(Enumerable.Repeat(0, intCount));
-            return ret;
-        }
-
-        public void FixCorr(int intPicWidth, int intPicHeight)
-        {
-            if (intPicWidth == intPicHeight)
-                dblXcorr = dblYcorr = 1.0;
-            else if (intPicHeight < intPicWidth)
-            {
-                dblXcorr = (double)intPicWidth / (double)intPicHeight;
-                dblYcorr = 1.0;
-            }
-            else
-            {
-                dblXcorr = 1.0;
-                dblYcorr = (double)intPicHeight / (double)intPicWidth;
-            }
-        }
-
-        private int MaxMandel(double dblReal, double dblImag)
-        {
-            int intCount = intCurrentMaxIter;
-            double dblRe = dblReal, dblIm = dblImag, dblRe2, dblIm2, dblReIm2;
-            double dblPrevReal = dblReal, dblPrevImag = dblImag; // Periodicity Checking
-            int n1 = 0; int n2 = 8;
-
-            do
-            {
-                intCount--;
-                if (intCount == 0)
-                    return MAXITER;
-
-                dblRe2 = dblRe * dblRe;
-                dblIm2 = dblIm * dblIm;
-                dblReIm2 = 2.0 * dblRe * dblIm;
-                dblRe = dblRe2 - dblIm2 + dblReal;
-                dblIm = dblReIm2 + dblImag;
-
-                if (dblPrevReal == dblRe && dblPrevImag == dblIm)
-                    return MAXITER;
-
-                n1++;
-
-                if (n1 >= n2)
+                if (intTotal == -1)
                 {
-                    dblPrevReal = dblRe;
-                    dblPrevImag = dblIm;
-                    n1 = 0;
-                    n2 *= 2;
-                }
-            }
-            while (dblRe2 + dblIm2 <= 4.0);
-
-            return intCurrentMaxIter - intCount;
-        }
-
-        private static IEnumerable<int> SteppedIterator(int intStartIndex, int intEndIndex) // Insanely more fun than: for (int i = intStartIndex; i < intEndIndex; i++) yield return i;
-        {
-            for (int i = 0, n = 0, m = 0, intDiff = intEndIndex - intStartIndex; i < intDiff; i++)
-            {
-                int v = (n * 8 + m) % intDiff;
-                yield return v + intStartIndex;
-
-                if (v + 8 < intDiff)
-                    n++;
-                else
-                {
-                    n = 0;
-                    m++;
-                }
-            }
-        }
-
-        public void DrawParallel(int intPicWidth, int intPicHeight, object[] data, int intDegreeOfParallelism) // Multiple threaded loop using Parallel.For
-        {
-            int intTotal = 0;
-            var arrFlag = new bool[intPicHeight];
-            var pOptions = new ParallelOptions { TaskScheduler = null, MaxDegreeOfParallelism = intDegreeOfParallelism };
-            ThreadPool.GetMinThreads(out int minWorker, out int minIOC);
-            var intNewWorker = intDegreeOfParallelism == -1 ? Environment.ProcessorCount : intDegreeOfParallelism;
-
-            if (intNewWorker != minWorker)
-                ThreadPool.SetMinThreads(intNewWorker, minIOC); // do we need to set this?
-
-            Parallel.ForEach(SteppedIterator(0, intPicHeight), pOptions, (j, loopState) =>
-            {
-                DrawParallelLineThread(intPicWidth, intPicHeight, j, data != null ? (List<int>)data[j] : null);
-                arrFlag[j] = true; // should be safe to access j, only one thread will do this
-
-                lock (objLock)
-                {
-                    intTotal++;
-
-                    if (0 == (intTotal % 50))
-                        Console.Write($"\r{new string(' ', 41 + 15)}\r{GetProgress(arrFlag, intPicHeight)} Completed {(double)intTotal * 100d / (double)intPicHeight:0.#}%");
-                }
-            });
-
-            Console.WriteLine($"\r{new string(' ', 41 + 15)}\r{GetProgress(arrFlag, intPicHeight)} Completed 100%");
-        }
-
-        private void DrawParallelLineThread(int intPicWidth, int intPicHeight, int j, List<int> row)
-        {
-            double y = (double)j / (double)intPicHeight * dblDiff * dblYcorr + dblYp - dblDiff * dblYcorr / 2.0;
-
-            for (int i = 0; i < intPicWidth; i++)
-            {
-                double x = (double)i / (double)intPicWidth * dblDiff * dblXcorr + dblXp - dblDiff * dblXcorr / 2.0;
-                int intIter = MaxMandel(x, y);
-
-                // save intIter in allocated buffer
-                if (row == null)
-                    continue;
-
-                row[i] = intIter;
-            }
-        }
-
-        public void DrawNormal(int intPicWidth, int intPicHeight, object[] data) // Single threaded loop
-        {
-            for (int j = 0; j < intPicHeight; j++)
-            {
-                double y = (double)j / (double)intPicHeight * dblDiff * dblYcorr + dblYp - dblDiff * dblYcorr / 2.0;
-
-                for (int i = 0; i < intPicWidth; i++)
-                {
-                    double x = (double)i / (double)intPicWidth * dblDiff * dblXcorr + dblXp - dblDiff * dblXcorr / 2.0;
-                    int intIter = MaxMandel(x, y);
-
-                    if (data == null)
-                        continue;
-
-                    ((List<int>)data[j])[i] = intIter;
+                    Console.WriteLine($"\r{new string(' ', 41 + 15)}\r{GetProgress(intPicHeight, intPicHeight)} Completed 100%");
+                    return;
                 }
 
-                if (0 == (j % 50))
-                    Console.Write($"\r{new string(' ', 41 + 15)}\r{GetProgress(j, intPicHeight)} Completed {(double)j * 100d / (double)intPicHeight:0.#}%");
+                if (0 == (intTotal % 50))
+                    Console.Write($"\r{new string(' ', 41 + 15)}\r{GetProgress(intTotal, intPicHeight)} Completed {(double)intTotal * 100d / (double)intPicHeight:0.#}%");
             }
 
-            Console.WriteLine($"\r{new string(' ', 41 + 15)}\r{GetProgress(intPicHeight, intPicHeight)} Completed 100%");
-        }
-
-        private string GetProgress(bool[] data, int m)
-        {
-            int intChunksize = m / 40; // assume every height is evenly divided by 40
-            var sb = new StringBuilder();
-
-            for (int i = 0, n = 0; i < m; i++)
+            private string GetProgress(bool[] data, int m)
             {
-                if (data[i])
-                    n++;
+                int intChunksize = m / 40; // assume every height is evenly divided by 40
+                var sb = new StringBuilder();
 
-                if ((i % intChunksize) + 1 == intChunksize)
+                for (int i = 0, n = 0; i < m; i++)
                 {
-                    if (n == 0)
+                    if (data[i])
+                        n++;
+
+                    if ((i % intChunksize) + 1 == intChunksize)
+                    {
+                        if (n == 0)
+                            sb.Append(lstProgress[0]);
+                        else if (n == intChunksize)
+                            sb.Append(lstProgress[5]);
+                        else
+                            sb.Append(lstProgress[(n % intChunksize) * 4 / intChunksize + 1]);
+
+                        n = 0;
+                    }
+                }
+
+                return sb.ToString();
+            }
+
+            private string GetProgress(int n, int m)
+            {
+                int intChunksize = m / 40; // assume every height is evenly divided by 40
+                var sb = new StringBuilder();
+
+                for (int i = 0; i < 40; i++)
+                {
+                    if (n <= i * intChunksize)
                         sb.Append(lstProgress[0]);
-                    else if (n == intChunksize)
+                    else if (n / intChunksize > i)
                         sb.Append(lstProgress[5]);
                     else
                         sb.Append(lstProgress[(n % intChunksize) * 4 / intChunksize + 1]);
-
-                    n = 0;
                 }
+
+                return sb.ToString();
             }
-
-            return sb.ToString();
-        }
-
-        private string GetProgress(int n, int m)
-        {
-            int intChunksize = m / 40; // assume every height is evenly divided by 40
-            var sb = new StringBuilder();
-
-            for (int i = 0; i < 40; i++)
-            {
-                if (n <= i * intChunksize)
-                    sb.Append(lstProgress[0]);
-                else if (n / intChunksize > i)
-                    sb.Append(lstProgress[5]);
-                else
-                    sb.Append(lstProgress[(n % intChunksize) * 4 / intChunksize + 1]);
-            }
-
-            return sb.ToString();
         }
     }
 }

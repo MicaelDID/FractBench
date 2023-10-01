@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FractBench", "FractBench\Fr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FractRaw2Png", "FractRaw2Png\FractRaw2Png.csproj", "{6CC2E525-AFA3-4C84-AC01-D314BEDF2DF4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLayer", "DataLayer\DataLayer.csproj", "{773DE90F-4929-4C72-ADDD-55FF51E8EF75}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{6CC2E525-AFA3-4C84-AC01-D314BEDF2DF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6CC2E525-AFA3-4C84-AC01-D314BEDF2DF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6CC2E525-AFA3-4C84-AC01-D314BEDF2DF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{773DE90F-4929-4C72-ADDD-55FF51E8EF75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{773DE90F-4929-4C72-ADDD-55FF51E8EF75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{773DE90F-4929-4C72-ADDD-55FF51E8EF75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{773DE90F-4929-4C72-ADDD-55FF51E8EF75}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
