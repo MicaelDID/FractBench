@@ -61,7 +61,7 @@ Its possible to select from 00 to 99 and selecting 00 will continue repeating un
 Selecting the multithreading selects between single threaded (normal for) and multiple threaded (using Parallel.For)
 - Multiple (normal) lets .NET select the amount of worker threads
 - Multiple (optimal) using twice as many threads as logical cores that I found is getting good results with this algoritm
-- Multiple (free) makes it possible to specify amount of worker threads from 2 to 999
+- Multiple (free) makes it possible to specify amount of worker threads from 2 to 999 (feel free to experiment with more or less threads than normal / optimal)
 
 Using FractBench with arguments is using the same notation like the input entered with the program without arguments.
 
