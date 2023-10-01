@@ -206,7 +206,7 @@ namespace FractBench
             }
 
             if (lstTime.Count() > 1)
-                Console.WriteLine($"Repeat summary: Count {lstTime.Count()}, Elapsed min / max / average {lstTime.Min():###,###,###,##0} ms / {lstTime.Max():###,###,###,##0} ms / {lstTime.Average():###,###,###,##0} ms");
+                Console.WriteLine($"Repeat summary: Count {lstTime.Count()}, Elapsed Min {lstTime.Min():###,###,###,##0} ms, Max {lstTime.Max():###,###,###,##0} ms, Average {lstTime.Average():###,###,###,##0} ms");
 
             if (data != null && intSave == 5)
                 SaveData(data, intX);
