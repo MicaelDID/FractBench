@@ -76,6 +76,8 @@ Using FractBench with arguments is using the same notation like the input entere
 
 FractBench 1353
 
+![image](https://i.imgur.com/Nj0K7Fj.gif)
+
 '1' Location 1 (normal / fast calculation intensity; famous Mandelbrot fractal starting location)
 
 '3' a 1080p image (1920 x 1080)
