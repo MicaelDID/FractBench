@@ -21,7 +21,14 @@ Note: 0 as input or ctrl c (at any time) to exit the program.
 
 ## Utility
 
-Included utilty (FractRaw2Png) to convert the saved raw dump to PNG.
+Included utilty (FractRaw2Png) to convert the saved raw dump to PNG that takes width and height as arguments and reading output.dat and creating output.png in the same directory.
+
+```
+FractBench 1253
+FractRaw2Png 1280 720
+```
+
+![image](https://i.imgur.com/zlwwsGa.png)
 
 ## Example of usage
 
